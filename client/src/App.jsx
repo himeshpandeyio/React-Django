@@ -1,18 +1,40 @@
-import React from 'react'
-import "./App.css"
+import { useEffect, useState } from "react";
+import API from "./api";
+import TaskForm from "./components/TaskForm";
+import TaskList from "./components/TaskList";
 
-const App = () => {
+function App() {
+    const [tasks, setTasks] = useState([]);
 
-  return (
-    <div>
-      <h1>Book Website</h1>
-      <div>
-        <input type="text" placeholder="Book Title..."/>
-        <input type="number" placeholder="Release Date..."/>
-        <button>Add Book</button>
-      </div>
-    </div>
-  )
+    useEffect(() => {
+        fetchTasks();
+    }, []);
+
+    const fetchTasks = async () => {
+        try {
+            const response = await API.get("tasks/");
+            setTasks(response.data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const addTask = (task) => {
+        setTasks((previousTasks) => [
+            task,
+            ...previousTasks
+        ]);
+    };
+
+    return (
+        <div>
+            <h1>Task Manager</h1>
+
+            <TaskForm onTaskCreated={addTask} />
+
+            <TaskList tasks={tasks} />
+        </div>
+    );
 }
 
-export default App
+export default App;
